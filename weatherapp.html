@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Basic Weather Application</title>
+<style>
+  :root {
+    --color-bg: #ffffff;
+    --color-text-primary: #111827;
+    --color-text-secondary: #6b7280;
+    --color-accent: #111827;
+    --color-card-bg: #f9fafb;
+    --color-shadow: rgba(0, 0, 0, 0.05);
+    --font-headline: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter&family=Poppins:wght@600;700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  a:hover,
+  a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 10;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 4rem;
+  }
+
+  .logo {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 1.375rem;
+    color: var(--color-accent);
+    user-select: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .nav-links a {
+    position: relative;
+    padding: 0.25rem 0;
+    color: var(--color-text-secondary);
+    transition: color 0.3s ease;
+  }
+
+  .nav-links a:hover,
+  .nav-links a:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .hero {
+    padding: 4rem 0 5rem;
+    text-align: center;
+  }
+
+  .hero h1 {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--color-accent);
+  }
+
+  @media (min-width: 640px) {
+    .hero h1 {
+      font-size: 4rem;
+    }
+  }
+
+  .hero p {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+
+  form {
+    display: flex;
+    justify-content: center;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  input[type="text"] {
+    flex-grow: 1;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    border: 1.5px solid #d1d5db;
+    border-radius: 0.75rem 0 0 0.75rem;
+    color: var(--color-text-primary);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgb(17 24 39 / 0.2);
+  }
+
+  button {
+    background-color: var(--color-accent);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 0 0.75rem 0.75rem 0;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+
+  button:hover,
+  button:focus-visible {
+    background-color: #22272e;
+    transform: scale(1.05);
+  }
+
+  button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .weather-card {
+    margin-top: 3rem;
+    background-color: var(--color-card-bg);
+    max-width: 480px;
+    margin: 3rem auto 0;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 5px 15px var(--color-shadow);
+    color: var(--color-text-primary);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .weather-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .weather-location {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .weather-desc {
+    font-style: italic;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .weather-info {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .weather-info div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .weather-info div svg {
+    stroke: var(--color-accent);
+    width: 24px;
+    height: 24px;
+  }
+
+  .spinner {
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid var(--color-accent);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin-left: 0.75rem;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .error-message {
+    margin-top: 1rem;
+    color: #dc2626;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  footer {
+    margin-top: 6rem;
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <div class="logo">WeatherApp</div>
+        <div class="nav-links">
+          <a href="#">Home</a>
+          <a href="#">About</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero container">
+      <h1>Check the Weather Anywhere</h1>
+      <p>Enter a city name to get current weather conditions instantly.</p>
+      <form id="weather-form">
+        <input type="text" id="city-input" name="city" placeholder="Enter city name" autocomplete="off" spellcheck="false" />
+        <button type="submit">Get Weather</button>
+      </form>
+      <p class="error-message" id="error-message" style="display:none;"></p>
+      <div id="loading-spinner" class="spinner" style="display:none;"></div>
+      <article id="weather-card" class="weather-card">
+        <h2 class="weather-location" id="location-name"></h2>
+        <p class="weather-desc" id="weather-desc"></p>
+        <div class="weather-info">
+          <div><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" /></svg><span id="temperature"></span></div>
+          <div><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /></svg><span id="wind-speed"></span></div>
+          <div><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 1 10 10c0 5.522-4.478 10-10 10a10 10 0 0 1-10-10C2 6.477 6.478 2 12 2z" /><path d="M12 6v6l4 2" /></svg><span id="time"></span></div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <footer>&copy; 2024 WeatherApp. All rights reserved.</footer>
+  <script>
+    const form = document.getElementById('weather-form');
+    const cityInput = document.getElementById('city-input');
+    const weatherCard = document.getElementById('weather-card');
+    const locationName = document.getElementById('location-name');
+    const weatherDesc = document.getElementById('weather-desc');
+    const temperatureEl = document.getElementById('temperature');
+    const windSpeedEl = document.getElementById('wind-speed');
+    const timeEl = document.getElementById('time');
+    const errorMessage = document.getElementById('error-message');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
+    function resetDisplay() {
+      weatherCard.classList.remove('visible');
+      locationName.textContent = '';
+      weatherDesc.textContent = '';
+      temperatureEl.textContent = '';
+      windSpeedEl.textContent = '';
+      timeEl.textContent = '';
+      errorMessage.style.display = 'none';
+      loadingSpinner.style.display = 'none';
+    }
+
+    async function fetchCoordinates(city) {
+      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
+      if (!response.ok) throw new Error('Failed to fetch location coordinates');
+      const data = await response.json();
+      if (!data.results || data.results.length === 0) throw new Error('City not found');
+      return {
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+        name: data.results[0].name,
+        country: data.results[0].country,
+        timezone: data.results[0].timezone
+      };
+    }
+
+    async function fetchWeather(lat, lon, timezone) {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=${encodeURIComponent(timezone)}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch weather data');
+      const data = await response.json();
+      if (!data.current_weather) throw new Error('Weather data not available');
+      return data.current_weather;
+    }
+
+    function formatTime(dateString, timezone) {
+      try {
+        const options = { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: timezone };
+        const dt = new Date(dateString);
+        return dt.toLocaleTimeString(undefined, options);
+      } catch {
+        return dateString;
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const city = cityInput.value.trim();
+      if (!city) {
+        errorMessage.textContent = 'Please enter a city name.';
+        errorMessage.style.display = 'block';
+        weatherCard.classList.remove('visible');
+        return;
+      }
+      resetDisplay();
+      loadingSpinner.style.display = 'inline-block';
+      try {
+        const location = await fetchCoordinates(city);
+        const weather = await fetchWeather(location.latitude, location.longitude, location.timezone);
+        loadingSpinner.style.display = 'none';
+        locationName.textContent = `${location.name}, ${location.country}`;
+        weatherDesc.textContent = mapWeatherCodeToDescription(weather.weathercode);
+        temperatureEl.textContent = `${weather.temperature.toFixed(1)}°C`;
+        windSpeedEl.textContent = `${weather.windspeed.toFixed(1)} km/h`;
+        timeEl.textContent = formatTime(weather.time, location.timezone);
+        weatherCard.classList.add('visible');
+      } catch (err) {
+        loadingSpinner.style.display = 'none';
+        errorMessage.textContent = err.message;
+        errorMessage.style.display = 'block';
+        weatherCard.classList.remove('visible');
+      }
+    });
+
+    function mapWeatherCodeToDescription(code) {
+      const codes = {
+        0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+        45: 'Fog', 48: 'Depositing rime fog', 51: 'Light drizzle', 53: 'Moderate drizzle',
+        55: 'Dense drizzle', 56: 'Light freezing drizzle', 57: 'Dense freezing drizzle',
+        61: 'Slight rain', 63: 'Moderate rain', 65: 'Heavy rain', 66: 'Light freezing rain',
+        67: 'Heavy freezing rain', 71: 'Slight snow fall', 73: 'Moderate snow fall',
+        75: 'Heavy snow fall', 77: 'Snow grains', 80: 'Slight rain showers',
+        81: 'Moderate rain showers', 82: 'Violent rain showers', 85: 'Slight snow showers',
+        86: 'Heavy snow showers', 95: 'Thunderstorm', 96: 'Thunderstorm with slight hail',
+        99: 'Thunderstorm with heavy hail'
+      };
+      return codes[code] || 'Unknown weather';
+    }
+  </script>
+</body>
+</html>
